@@ -6,6 +6,7 @@
 //
 
 #import "AppDelegate.h"
+#import "GameViewController.h"
 
 @interface AppDelegate ()
 
@@ -15,7 +16,17 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+    self.window.backgroundColor = [UIColor whiteColor];
+    
+    GameViewController* viewController = [[[GameViewController alloc] init] autorelease];
+    
+    self.window.rootViewController = viewController;
+    [self.window.rootViewController prefersStatusBarHidden];
+    [self.window makeKeyAndVisible];
+    
+//    [UIApplication sharedApplication].statusBarHidden = YES;
+    
     return YES;
 }
 
@@ -40,5 +51,9 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 
+- (void)dealloc {
+    [self.window release];
+    [super dealloc];
+}
 
 @end
