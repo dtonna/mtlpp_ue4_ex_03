@@ -42,7 +42,7 @@ private:
     dispatch_semaphore_t in_flight_semaphore_;
     mtlpp::Device device_;
     mtlpp::CommandQueue commandQueue_;
-    mtlpp::RenderPassDescriptor drawableRenderDescriptor_;
+    mtlpp::RenderPassDescriptor render_pass_descriptor_;
     mtlpp::Buffer dynamicUniformBuffer_[max_buffers_in_flight];
     mtlpp::Buffer dynamicUniformBuffer2_[max_buffers_in_flight];
     mtlpp::RenderPipelineState pipelineState_;

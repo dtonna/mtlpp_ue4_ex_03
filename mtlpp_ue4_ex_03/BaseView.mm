@@ -155,7 +155,7 @@
         std::cout << " duration : " << link.duration << " delta : " << delta << std::endl;
         delta = link.duration;
     }
-    std::cout << "render : " << link.targetTimestamp << " timestamp : " << link.timestamp << " prev : " << _previousTargetTimestamp << " delta : " << delta << " duration : " << link.duration << std::endl;
+//    std::cout << "render : " << link.targetTimestamp << " timestamp : " << link.timestamp << " prev : " << _previousTargetTimestamp << " delta : " << delta << " duration : " << link.duration << std::endl;
   
 #if RENDER_ON_MAIN_THREAD
     [_delegate updateTime:delta];

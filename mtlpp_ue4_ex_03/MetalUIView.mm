@@ -32,6 +32,7 @@ mtlpp::Device g_device;
 
 + (Class) layerClass
 {
+    g_device = MTLCreateSystemDefaultDevice();
     return [CAMetalLayer class];
 }
 
@@ -171,7 +172,9 @@ mtlpp::Device g_device;
 
 - (void)stopRenderLoop
 {
-    [_displayLink invalidate];
+    if (nil != _displayLink) {
+        [_displayLink invalidate];
+    }
 }
 
 #if !RENDER_ON_MAIN_THREAD

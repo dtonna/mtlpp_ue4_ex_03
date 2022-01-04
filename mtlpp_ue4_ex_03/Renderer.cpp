@@ -31,6 +31,9 @@ renderer::renderer()
 renderer::renderer(CAMetalLayer* metal_layer)
 : device_(metal_layer.device)
 , depth_(0.0)
+, rotation_(0.0)
+, uniformBufferIndex_(0)
+, currentDrawable_()
 , in_flight_semaphore_(dispatch_semaphore_create(max_buffers_in_flight))
 {
     load_metal();
@@ -62,17 +65,6 @@ void renderer::load_metal() {
     vertexLayouts[(uint64_t)BufferIndexMeshGenerics].SetStride(8);
     vertexLayouts[(uint64_t)BufferIndexMeshGenerics].SetStepRate(1);
     vertexLayouts[(uint64_t)BufferIndexMeshGenerics].SetStepFunction(mtlpp::VertexStepFunction::PerVertex);
-    
-    
-    //    ns::AutoReleased<ns::String> vertexShader_("vertexShader");
-    //    ns::AutoReleased<ns::String> fragmentShader_("fragmentShader");
-    //    ns::AutoReleased<ns::String> fragmentShader2_("fragmentShader2");
-    //
-    //    defaultLibrary_ = device_.NewDefaultLibrary();
-    //    vertexFunction_ =  defaultLibrary_.NewFunction(vertexShader_);
-    //    fragmentFunction_ = defaultLibrary_.NewFunction(fragmentShader_);
-    //    fragmentFunction2_ = defaultLibrary_.NewFunction(fragmentShader2_);
-    //    NSLog(@"retain count %ld\n", CFGetRetainCount(defaultLibrary_.GetPtr()));
     
     shader_.CreateShader(device_);
     
@@ -153,9 +145,9 @@ void renderer::load_metal() {
     
     commandQueue_ = device_.NewCommandQueue();
     
-    drawableRenderDescriptor_.GetColorAttachments()[0].SetLoadAction(mtlpp::LoadAction::Clear);
-    drawableRenderDescriptor_.GetColorAttachments()[0].SetStoreAction(mtlpp::StoreAction::Store);
-    drawableRenderDescriptor_.GetColorAttachments()[0].SetClearColor(mtlpp::ClearColor(0, 0, 0, 1.0));
+    render_pass_descriptor_.GetColorAttachments()[0].SetLoadAction(mtlpp::LoadAction::Clear);
+    render_pass_descriptor_.GetColorAttachments()[0].SetStoreAction(mtlpp::StoreAction::Store);
+    render_pass_descriptor_.GetColorAttachments()[0].SetClearColor(mtlpp::ClearColor(0, 0, 0, 1.0));
     
 }
 
@@ -232,12 +224,12 @@ void renderer::build_depth_texture(CGSize drawable_size)
     depthAttachment.SetTexture(depthTexture_);
     depthAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
     depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
-    drawableRenderDescriptor_.SetDepthAttachment(depthAttachment);
+    render_pass_descriptor_.SetDepthAttachment(depthAttachment);
     
     stencilAttachment.SetTexture(depthTexture_);
     stencilAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
     stencilAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
-    drawableRenderDescriptor_.SetStencilAttachment(stencilAttachment);
+    render_pass_descriptor_.SetStencilAttachment(stencilAttachment);
 }
 
 void renderer::drawable_resize(CGSize drawable_size) {
@@ -252,7 +244,7 @@ void renderer::update_current_drawable(mtlpp::Drawable next_drawable) {
 }
 
 void renderer::update_pass_descriptor(mtlpp::Texture texture) {
-    drawableRenderDescriptor_.GetColorAttachments()[0].SetTexture(texture);
+    render_pass_descriptor_.GetColorAttachments()[0].SetTexture(texture);
 }
 
 void renderer::render(/*double delta*/) {
@@ -291,7 +283,7 @@ void renderer::render(/*double delta*/) {
     
     /// Final pass rendering code here
     
-    mtlpp::RenderCommandEncoder renderEncoder = commandBuffer.RenderCommandEncoder(drawableRenderDescriptor_);
+    mtlpp::RenderCommandEncoder renderEncoder = commandBuffer.RenderCommandEncoder(render_pass_descriptor_);
     renderEncoder.SetLabel("MyRenderEncoder");
 //    mtlpp::Viewport viewport(0, 0, (float)drawable_size.width, (float)drawable_size.height, 0.1, 1);
 //    renderEncoder.SetViewport(viewport);

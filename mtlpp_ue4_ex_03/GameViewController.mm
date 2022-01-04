@@ -10,7 +10,7 @@
 #import "Renderer.hpp"
 #import "MetalUIView.h"
 
-extern mtlpp::Device g_device;
+//extern mtlpp::Device g_device;
 
 @implementation GameViewController
 {
@@ -36,7 +36,7 @@ extern mtlpp::Device g_device;
     _view = [[MetalUIView alloc] initWithFrame:contentSize];
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     _view.metalLayer.device = device;
-    g_device = device;
+//    g_device = device;
     _view.delegate = self;
     
     _view.metalLayer.presentsWithTransaction = NO;
@@ -96,4 +96,5 @@ extern mtlpp::Device g_device;
 {
     _renderer->update_game_state(delta);
 }
+
 @end
